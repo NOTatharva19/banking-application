@@ -18,35 +18,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      # 1. Checkout
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Validate HTML
+      # 2. Build / Validate
+      - name: Build and validate application
         run: |
+          echo "Building Banking Application..."
           test -f index.html
-          echo "index.html found"
-
-      - name: Validate JavaScript
-        run: |
           test -f script.js
-          echo "script.js found"
-
-      - name: Validate CSS
-        run: |
           test -f style.css
-          echo "style.css found"
+          echo "Build successful!"
 
-      - name: Prepare deployment package
+      # 3. Test
+      - name: Run application tests
+        run: |
+          echo "Running application tests..."
+
+          grep -q "<html" index.html
+          grep -q "<script" index.html
+          grep -q "<link" index.html
+          test -s script.js
+          test -s style.css
+
+          echo "All tests passed!"
+
+      # 4. Package
+      - name: Package application
         run: |
           mkdir deploy
           cp index.html deploy/
           cp script.js deploy/
           cp style.css deploy/
+          echo "Application packaged successfully."
 
+      # 5. Upload package
       - name: Upload website artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: deploy
 
+      # 6. Deploy
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
