@@ -19,47 +19,60 @@ jobs:
 
     steps:
 
-      # 1. Checkout
+      # 1. Checkout source code
       - name: Checkout source code
         uses: actions/checkout@v4
 
       # 2. Build / Validate
-      - name: Build and validate application
+      - name: Build application
         run: |
           echo "Building Banking Application..."
+
           test -f index.html
           test -f script.js
           test -f style.css
-          echo "Build successful!"
 
-      # 3. Test
-      - name: Run application tests
-        run: |
-          echo "Running application tests..."
-
-          grep -q "<html" index.html
-          grep -q "<script" index.html
-          grep -q "<link" index.html
+          test -s index.html
           test -s script.js
           test -s style.css
 
-          echo "All tests passed!"
+          echo "Build successful!"
 
-      # 4. Package
+      # 3. Automated Testing
+      - name: Run automated tests
+        run: |
+          echo "Running application tests..."
+
+          grep -q "Customer Registration" index.html
+          grep -q "Enter your name" index.html
+          grep -q "Enter your email" index.html
+          grep -q "Register" index.html
+
+          grep -q "checkBalance" script.js
+          grep -q "Banking Application Loaded" script.js
+
+          grep -q "font-family" style.css
+          grep -q "button" style.css
+
+          echo "All automated tests passed!"
+
+      # 4. Package application
       - name: Package application
         run: |
           mkdir deploy
+
           cp index.html deploy/
           cp script.js deploy/
           cp style.css deploy/
+
           echo "Application packaged successfully."
 
-      # 5. Upload package
+      # 5. Upload deployment package
       - name: Upload website artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: deploy
 
-      # 6. Deploy
+      # 6. Deploy application
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
