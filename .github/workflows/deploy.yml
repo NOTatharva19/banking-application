@@ -1,0 +1,52 @@
+name: Banking Application CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Validate HTML
+        run: |
+          test -f index.html
+          echo "index.html found"
+
+      - name: Validate JavaScript
+        run: |
+          test -f script.js
+          echo "script.js found"
+
+      - name: Validate CSS
+        run: |
+          test -f style.css
+          echo "style.css found"
+
+      - name: Prepare deployment package
+        run: |
+          mkdir deploy
+          cp index.html deploy/
+          cp script.js deploy/
+          cp style.css deploy/
+
+      - name: Upload website artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: deploy
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
